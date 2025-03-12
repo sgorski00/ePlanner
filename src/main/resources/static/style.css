@@ -1,0 +1,39 @@
+body {
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+.header, .footer {
+    background-color: #343a40;
+    color: white;
+    padding: 15px 0;
+}
+.navbar {
+    background-color: #495057;
+}
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    margin: 0;
+    /*min-width: 100%;*/
+}
+
+.form-container {
+    max-width: 100%;
+    border-radius: 15px;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+}
+
+@media (min-width: 768px) {
+    .form-container {
+        max-width: 75%;
+    }
+}
+
+@media (min-width: 992px) {
+    .form-container {
+        max-width: 50%;
+    }
+}
