@@ -7,6 +7,7 @@ import pl.sgorski.EPlanner.repository.EventRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class EventService {
@@ -24,5 +25,11 @@ public class EventService {
 
     public void save(Event event) {
         repository.save(event);
+    }
+
+    public Event getById(Long id) {
+        return repository.findById(id).orElseThrow(
+                () -> new NoSuchElementException("Event not found!")
+        );
     }
 }

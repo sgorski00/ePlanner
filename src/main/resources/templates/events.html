@@ -1,16 +1,32 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <th:block th:replace="~{/fragments/header_fragment :: header('Events')}"></th:block>
 <body>
 <th:block th:replace="~{/fragments/body_fragments :: header}"></th:block>
 <th:block th:replace="~{/fragments/body_fragments :: nav}"></th:block>
 
-<main class="content container">
+<main class="content container mt-4 w-lg-75 mx-auto">
     <div class="row">
+        <h2 class="mb-4">Events for: <span th:text="${dateFrom}"></span> - <span th:text="${dateTo}"></span></h2>
+        <h5 class="mb-4 text-danger" th:if="${error}" th:text="${error}"></h5>
+        <h5 class="mb-4" th:if="${info}" th:text="${info}"></h5>
         <div class="col-md-12">
-            <h2 class="mb-4">Events for: <span th:text="${dayFrom}"></span> - <span th:text="${dayTo}"></span></h2>
-
-            <table class="table table-bordered">
+            <div class="mb-3 p-3 bg-light border rounded ">
+                <form th:action="@{/events}" method="get" class="row g-3">
+                    <div class="col-md-5">
+                        <label for="dateFrom" class="form-label">Start Date:</label>
+                        <input type="date" th:value="${dateFrom}" name="dateFrom" id="dateFrom" class="form-control">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="dateTo" class="form-label">End Date:</label>
+                        <input type="date" th:value="${dateTo}" name="dateTo" id="dateTo" class="form-control">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Go</button>
+                    </div>
+                </form>
+            </div>
+            <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
                     <th>Day</th>
@@ -20,7 +36,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="event : ${events}">
+                <tr class="table-hover" role="button" th:onclick="|window.location.href='@{/events/{id}(id=${event.id})}'|" th:each="event : ${events}">
                     <td th:text="${event.day}"></td>
                     <td th:text="${event.hour}"></td>
                     <td th:text="${event.name}"></td>
