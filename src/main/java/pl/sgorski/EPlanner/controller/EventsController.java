@@ -92,4 +92,41 @@ public class EventsController {
         redirectAttributes.addFlashAttribute("info", "Event added succesfully");
         return "redirect:/events/add";
     }
+
+    @GetMapping("/edit/{id}")
+    public String showAddEventForm(
+            @PathVariable("id") String id,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ){
+        try{
+            Long idLong = Long.parseLong(id);
+            Event event = eventService.getById(idLong);
+            model.addAttribute("event", event);
+        } catch (NumberFormatException e) {
+            redirectAttributes.addFlashAttribute("error", "Id must be number");
+            return "redirect:/events";
+        } catch (NoSuchElementException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/events";
+        }
+        model.addAttribute("today", LocalDate.now());
+        return "edit_event";
+    }
+
+    @PostMapping("/edit")
+    public String editEvent(
+            @Valid @ModelAttribute("event") Event event,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes
+    ){
+        if(bindingResult.hasErrors()){
+            redirectAttributes.addFlashAttribute("error", "Something went wrong.");
+            return "redirect:/events/add";
+        }
+
+        eventService.save(event);
+        redirectAttributes.addFlashAttribute("info", "Event updated succesfully");
+        return "redirect:/events";
+    }
 }
