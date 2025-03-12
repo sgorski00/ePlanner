@@ -7,11 +7,14 @@
 
 <main class="content container mt-4 w-lg-75 mx-auto">
     <div class="row">
-        <h2 class="mb-4">Events for: <span th:text="${dateFrom}"></span> - <span th:text="${dateTo}"></span></h2>
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h2 class="mb-0">Events for: <span th:text="${dateFrom}"></span> - <span th:text="${dateTo}"></span></h2>
+            <a th:href="@{/events/add}" class="btn btn-primary w-auto">Add event</a>
+        </div>
         <h5 class="mb-4 text-danger" th:if="${error}" th:text="${error}"></h5>
         <h5 class="mb-4" th:if="${info}" th:text="${info}"></h5>
         <div class="col-md-12">
-            <div class="mb-3 p-3 bg-light border rounded ">
+            <div class="mb-3 p-3 bg-light border rounded me-auto">
                 <form th:action="@{/events}" method="get" class="row g-3">
                     <div class="col-md-5">
                         <label for="dateFrom" class="form-label">Start Date:</label>
