@@ -1,13 +1,21 @@
 package pl.sgorski.EPlanner.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.management.relation.Role;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "app_users")
@@ -15,13 +23,17 @@ import javax.management.relation.Role;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApplicationUser {
+public class ApplicationUser implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(min = 3, max = 50)
     private String username;
 
+    @NotBlank
+    @Email
     private String email;
 
     private String password;
@@ -34,6 +46,11 @@ public class ApplicationUser {
 
     private static PasswordEncoder passwordEncoder;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.toString().toUpperCase()));
+    }
+
     public enum Role {
         USER,
         ADMIN
@@ -41,14 +58,14 @@ public class ApplicationUser {
 
     @PreUpdate
     public void preUpdate() {
-        if(this.providerId != null && !this.password.startsWith("$2a$")) {
+        if(this.providerId == null && !this.password.startsWith("$2a$")) {
             this.password = passwordEncoder.encode(this.password);
         }
     }
 
     @PrePersist
     public void prePersist() {
-        if(this.providerId != null && !this.password.startsWith("$2a$")) {
+        if(this.providerId == null && !this.password.startsWith("$2a$")) {
             this.password = passwordEncoder.encode(this.password);
         }
     }

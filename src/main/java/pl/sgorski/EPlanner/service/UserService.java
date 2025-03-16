@@ -28,6 +28,10 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("User " + username + " is not a local account");
         }
 
-        return (UserDetails) user;
+        return user;
+    }
+
+    public void save(ApplicationUser user) {
+        userRepository.save(user);
     }
 }
