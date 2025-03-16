@@ -1,5 +1,6 @@
 package pl.sgorski.EPlanner.controller;
 
+import com.github.javafaker.App;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -7,10 +8,13 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import pl.sgorski.EPlanner.model.ApplicationUser;
 import pl.sgorski.EPlanner.model.Event;
 import pl.sgorski.EPlanner.service.EventService;
+import pl.sgorski.EPlanner.service.UserService;
 import pl.sgorski.EPlanner.utils.DateUtils;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -21,17 +25,21 @@ import java.util.NoSuchElementException;
 public class EventsController {
 
     private final EventService eventService;
+    private final UserService userService;
 
     @Autowired
-    public EventsController(EventService eventService) {
+    public EventsController(EventService eventService, UserService userService) {
         this.eventService = eventService;
+        this.userService = userService;
     }
 
     @GetMapping
     public String show(
             @RequestParam(value = "dateFrom", required = false) String dateFromStr,
             @RequestParam(value = "dateTo", required = false) String dateToStr,
-            Model model
+            Model model,
+            Principal principal,
+            RedirectAttributes redirectAttributes
     ) {
         LocalDate dateFrom, dateTo;
         try{
@@ -41,7 +49,15 @@ public class EventsController {
             dateFrom = LocalDate.now().withDayOfMonth(1);
             dateTo = DateUtils.getLastDayOfMonth(LocalDate.now());
         }
-        List<Event> events = eventService.getAllEventsBetween(dateFrom, dateTo);
+
+        ApplicationUser user;
+        try{
+            user = userService.findByUsername(principal.getName());
+        } catch (NoSuchElementException e) {
+            redirectAttributes.addFlashAttribute("info", "User not found");
+            return "redirect:/";
+        }
+        List<Event> events = eventService.getAllEventsBetweenForUser(dateFrom, dateTo, user);
         model.addAttribute("events", events);
         model.addAttribute("dateFrom", dateFrom);
         model.addAttribute("dateTo", dateTo);
@@ -52,19 +68,33 @@ public class EventsController {
     public String showEvent(
             @PathVariable("id") String id,
             Model model,
-            RedirectAttributes redirectAttributes
+            RedirectAttributes redirectAttributes,
+            Principal principal
     ){
+        Event event;
+        ApplicationUser user;
+
+        try{
+            user = userService.findByUsername(principal.getName());
+        } catch (NoSuchElementException e) {
+            redirectAttributes.addFlashAttribute("info", "User not found");
+            return "redirect:/";
+        }
+
         try {
             Long idLong = Long.parseLong(id);
-            Event event = eventService.getById(idLong);
-            model.addAttribute("event", event);
-        } catch (NoSuchElementException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/events";
+            event = eventService.getById(idLong);
+            if(!event.getUser().equals(user)) {
+                throw new IllegalArgumentException("Access denied");
+            }
         } catch (NumberFormatException e) {
             redirectAttributes.addFlashAttribute("error", "Id must be number");
             return "redirect:/events";
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/events";
         }
+        model.addAttribute("event", event);
         return "event";
     }
 
@@ -81,11 +111,21 @@ public class EventsController {
     public String addEvent(
             @Valid @ModelAttribute("event") Event event,
             BindingResult bindingResult,
-            RedirectAttributes redirectAttributes
+            RedirectAttributes redirectAttributes,
+            Principal principal
     ){
         if(bindingResult.hasErrors()){
             redirectAttributes.addFlashAttribute("error", "Something went wrong.");
             return "redirect:/events/add";
+        }
+
+        ApplicationUser user;
+        try{
+            user = userService.findByUsername(principal.getName());
+            event.setUser(user);
+        } catch (NoSuchElementException e) {
+            redirectAttributes.addFlashAttribute("error", "User not found");
+            return "redirect:/events";
         }
 
         eventService.save(event);

@@ -2,6 +2,7 @@ package pl.sgorski.EPlanner.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.sgorski.EPlanner.model.ApplicationUser;
 import pl.sgorski.EPlanner.model.Event;
 import pl.sgorski.EPlanner.repository.EventRepository;
 
@@ -19,8 +20,8 @@ public class EventService {
         this.repository = repository;
     }
 
-    public List<Event> getAllEventsBetween(LocalDate dateFrom, LocalDate dateTo){
-        return repository.findAllByDayBetweenOrderByDayAsc(dateFrom, dateTo);
+    public List<Event> getAllEventsBetweenForUser(LocalDate dateFrom, LocalDate dateTo, ApplicationUser user){
+        return repository.findAllByDayBetweenAndUserOrderByDayAsc(dateFrom, dateTo, user);
     }
 
     public void save(Event event) {

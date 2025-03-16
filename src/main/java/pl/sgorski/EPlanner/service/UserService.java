@@ -20,9 +20,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, IllegalArgumentException {
-        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(
-                () -> new UsernameNotFoundException("User " + username + " not found")
-        );
+        ApplicationUser user = findByUsername(username);
 
         if(user.getProviderId() != null) {
             throw new IllegalArgumentException("User " + username + " is not a local account");
@@ -33,5 +31,11 @@ public class UserService implements UserDetailsService {
 
     public void save(ApplicationUser user) {
         userRepository.save(user);
+    }
+
+    public ApplicationUser findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("User " + username + " not found")
+        );
     }
 }
