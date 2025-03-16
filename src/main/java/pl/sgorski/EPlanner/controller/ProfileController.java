@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 @Controller
 public class ProfileController {
 
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public ProfileController(UserService userService) {

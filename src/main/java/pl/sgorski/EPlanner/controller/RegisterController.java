@@ -13,8 +13,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.sgorski.EPlanner.model.ApplicationUser;
 import pl.sgorski.EPlanner.service.UserService;
 
-import java.util.Arrays;
-
 @Controller
 @RequestMapping("/register")
 public class RegisterController {
