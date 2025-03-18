@@ -7,6 +7,8 @@
 
 <main class="content container mt-4 w-lg-75 mx-auto">
     <div class="row">
+        <h6 th:if="${info}" th:text="${info}"></h6>
+        <h6 th:if="${error}" th:text="${error}"></h6>
         <div class="col-md-8 pb-sm-3">
             <div class="card shadow-sm">
                 <div class="card-header bg-dark text-white">
@@ -28,9 +30,15 @@
                     <h4 class="mb-0">Options</h4>
                 </div>
                 <div class="card-body text-center">
-                    <a th:href="@{/events/edit/{id}(id=${event.id})}" class="btn btn-primary w-100 mb-2">Edit</a>
-                    <a th:href="@{/events/complete/{id}(id=${event.id})}" class="btn btn-success w-100 mb-2">Finish</a>
-                    <a th:href="@{/events/archive/{id}(id=${event.id})}" class="btn btn-warning w-100 mb-2">Archive</a>
+                    <form th:action="@{/events/edit/{id}(id=${event.id})}" method="post">
+                        <button type="submit" class="btn btn-primary w-100 mb-2">Edit</button>
+                    </form>
+                    <form th:action="@{/events/complete/{id}(id=${event.id})}" method="post">
+                        <button type="submit" class="btn btn-success w-100 mb-2">Finish</button>
+                    </form>
+                    <form th:action="@{/events/archive/{id}(id=${event.id})}" method="post">
+                        <button type="submit" class="btn btn-warning w-100 mb-2">Archive</button>
+                    </form>
                     <form th:action="@{/events/delete/{id}(id=${event.id})}" method="post" onsubmit="return confirm('Are you sure that you want to delete this event?');">
                         <button type="submit" class="btn btn-danger w-100">Delete</button>
                     </form>
