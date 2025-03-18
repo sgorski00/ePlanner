@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <body>
 
 <header th:fragment="header" class="header text-center">
@@ -17,8 +17,17 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="/events/add">Add event</a></li>
                 <li class="nav-item"><a class="nav-link" href="/events">Your events</a></li>
-                <li class="nav-item"><a class="nav-link" href="/profile" th:text="'Profile (' + ${#authentication.principal.getUsername()} + ')'">Profile</a></li>
-                <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile"
+                       th:text="'Profile (' + ${gUsername} + ')'">
+                        Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <form th:action="@{/logout}" method="POST">
+                        <button class="nav-link" type="submit">Logout</button>
+                    </form>
+                </li>
             </ul>
         </div>
     </div>

@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import pl.sgorski.EPlanner.model.ApplicationUser;
 import pl.sgorski.EPlanner.service.OAuth2UserService;
 
@@ -35,7 +36,6 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers("/style.css", "/images/**", "/h2-console/**").permitAll()
                         .requestMatchers("/login/**", "/register/**").not().authenticated()
-                        .requestMatchers("/logout/**").authenticated()
                         .anyRequest().authenticated())
                 .formLogin(login -> login
                         .loginPage("/login")
@@ -46,7 +46,8 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/")
                         .loginPage("/login"))
                 .logout(l -> l
-                        .logoutSuccessUrl("/login"))
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
+                        .logoutSuccessUrl("/login?logout"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(h -> h.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .sessionManagement(s -> s
