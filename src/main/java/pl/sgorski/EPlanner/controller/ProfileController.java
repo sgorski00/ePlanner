@@ -32,6 +32,7 @@ public class ProfileController {
         try{
             ApplicationUser user = userService.findByUsername(principal.getName());
             model.addAttribute("user", user);
+            model.addAttribute("eventsSize", user.getEvents().size());
         } catch (NoSuchElementException e) {
             redirectAttributes.addFlashAttribute("info", "User not found");
             return "redirect:/";

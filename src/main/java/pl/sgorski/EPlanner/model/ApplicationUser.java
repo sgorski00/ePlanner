@@ -45,7 +45,7 @@ public class ApplicationUser implements UserDetails {
 
     private String providerId;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Event> events = new ArrayList<>();
 
     private static PasswordEncoder passwordEncoder;

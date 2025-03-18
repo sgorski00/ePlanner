@@ -44,6 +44,12 @@ public class DataSeeder implements CommandLineRunner {
 
     private List<ApplicationUser> seedUsers() {
         List<ApplicationUser> users = new ArrayList<>();
+        ApplicationUser admin = new ApplicationUser();
+        admin.setUsername("admin");
+        admin.setPassword(passwordEncoder.encode("admin"));
+        admin.setEmail("admin@email.com");
+        admin.setRole(ApplicationUser.Role.ADMIN);
+        userService.save(admin);
         for(int i = 0; i < 10; i++) {
             ApplicationUser user = new ApplicationUser();
             user.setUsername(faker.name().username());
@@ -57,6 +63,7 @@ public class DataSeeder implements CommandLineRunner {
             users.add(user);
             userService.save(user);
         }
+        users.add(admin);
         return users;
     }
 
