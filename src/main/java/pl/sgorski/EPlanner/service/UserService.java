@@ -25,4 +25,8 @@ public class UserService {
                 () -> new UsernameNotFoundException("User " + username + " not found")
         );
     }
+
+    public void delete(ApplicationUser user) {
+        userRepository.delete(user);
+    }
 }
