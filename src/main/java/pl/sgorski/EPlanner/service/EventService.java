@@ -34,4 +34,8 @@ public class EventService {
                 () -> new NoSuchElementException("Event not found!")
         );
     }
+
+    public void delete(Event event) {
+        repository.delete(event);
+    }
 }

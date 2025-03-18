@@ -13,7 +13,10 @@ import pl.sgorski.EPlanner.service.EventService;
 import pl.sgorski.EPlanner.service.UserService;
 import pl.sgorski.EPlanner.utils.DateUtils;
 
+import java.nio.file.AccessDeniedException;
 import java.security.Principal;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -166,6 +169,78 @@ public class EventsController {
 
         eventService.save(event);
         redirectAttributes.addFlashAttribute("info", "Event updated succesfully");
+        return "redirect:/events";
+    }
+
+    @PostMapping("/complete/{id}")
+    public String completeEvent(
+            @PathVariable("id") Long id,
+            Principal principal,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            ApplicationUser user = userService.findByUsername(principal.getName());
+            Event event = eventService.getById(id);
+            event.setFinishedAt(Timestamp.from(Instant.now()));
+            if(event.getUser().equals(user)) {
+                event.setFinishedAt(Timestamp.from(Instant.now()));
+                eventService.save(event);
+                redirectAttributes.addFlashAttribute("info", "Event completed successfully");
+            } else {
+                throw new AccessDeniedException("Access denied");
+            }
+        } catch (NoSuchElementException | AccessDeniedException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/events";
+        }
+
+        return "redirect:/events/" + id;
+    }
+
+    @PostMapping("/archive/{id}")
+    public String archiveEvent(
+            @PathVariable("id") Long id,
+            Principal principal,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            ApplicationUser user = userService.findByUsername(principal.getName());
+            Event event = eventService.getById(id);
+            event.setFinishedAt(Timestamp.from(Instant.now()));
+            if(event.getUser().equals(user)) {
+                event.setArchivedAt(Timestamp.from(Instant.now()));
+                eventService.save(event);
+                redirectAttributes.addFlashAttribute("info", "Event archived successfully");
+            } else {
+                throw new AccessDeniedException("Access denied");
+
+            }
+        } catch (NoSuchElementException | AccessDeniedException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/events";
+        }
+        return "redirect:/events/" + id;
+    }
+
+    @PostMapping("/delete/{id}")
+    public String deleteEvent(
+            @PathVariable("id") Long id,
+            Principal principal,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            ApplicationUser user = userService.findByUsername(principal.getName());
+            Event event = eventService.getById(id);
+            event.setFinishedAt(Timestamp.from(Instant.now()));
+            if(event.getUser().equals(user)) {
+                eventService.delete(event);
+                redirectAttributes.addFlashAttribute("info", "Event deleted successfully");
+            } else {
+                throw new AccessDeniedException("Access denied");
+            }
+        } catch (NoSuchElementException | AccessDeniedException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
         return "redirect:/events";
     }
 }
