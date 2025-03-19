@@ -189,7 +189,9 @@ public class EventsController {
         try {
             ApplicationUser user = userService.findByUsername(principal.getName());
             Event event = eventService.getById(id);
-            event.setFinishedAt(Timestamp.from(Instant.now()));
+            if(!event.canEdit()){
+                throw new IllegalArgumentException("Cannot complete event with this status.");
+            }
             if(event.getUser().equals(user)) {
                 event.setFinishedAt(Timestamp.from(Instant.now()));
                 eventService.save(event);
@@ -197,7 +199,7 @@ public class EventsController {
             } else {
                 throw new AccessDeniedException("Access denied");
             }
-        } catch (NoSuchElementException | AccessDeniedException e) {
+        } catch (NoSuchElementException | AccessDeniedException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/events";
         }
@@ -214,7 +216,9 @@ public class EventsController {
         try {
             ApplicationUser user = userService.findByUsername(principal.getName());
             Event event = eventService.getById(id);
-            event.setFinishedAt(Timestamp.from(Instant.now()));
+            if(!event.canEdit()){
+                throw new IllegalArgumentException("Cannot archive event with this status.");
+            }
             if(event.getUser().equals(user)) {
                 event.setArchivedAt(Timestamp.from(Instant.now()));
                 eventService.save(event);
@@ -239,7 +243,6 @@ public class EventsController {
         try {
             ApplicationUser user = userService.findByUsername(principal.getName());
             Event event = eventService.getById(id);
-            event.setFinishedAt(Timestamp.from(Instant.now()));
             if(event.getUser().equals(user)) {
                 eventService.delete(event);
                 redirectAttributes.addFlashAttribute("info", "Event deleted successfully");
