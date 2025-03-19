@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import pl.sgorski.EPlanner.model.ApplicationUser;
 import pl.sgorski.EPlanner.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -28,5 +30,9 @@ public class UserService {
 
     public void delete(ApplicationUser user) {
         userRepository.delete(user);
+    }
+
+    public List<ApplicationUser> getAllUsers() {
+        return userRepository.findAll();
     }
 }
