@@ -58,4 +58,8 @@ public class Event {
     public void setLastEdit(){
         this.lastEdit = Timestamp.from(Instant.now());
     }
+
+    public boolean canEdit() {
+        return this.getFinishedAt() == null && this.getArchivedAt() == null;
+    }
 }

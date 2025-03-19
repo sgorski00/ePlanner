@@ -5,6 +5,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import pl.sgorski.EPlanner.model.ApplicationUser;
 import pl.sgorski.EPlanner.model.Event;
+import pl.sgorski.EPlanner.model.EventStatus;
 import pl.sgorski.EPlanner.repository.EventRepository;
 
 import java.time.LocalDate;
@@ -23,6 +24,18 @@ public class EventService {
 
     public List<Event> getAllEventsBetweenForUser(LocalDate dateFrom, LocalDate dateTo, ApplicationUser user){
         return repository.findAllByDayBetweenAndUserOrderByDayAsc(dateFrom, dateTo, user);
+    }
+
+    public List<Event> getAllEventsBetweenForUserWithStatus(LocalDate dateFrom, LocalDate dateTo, ApplicationUser user, EventStatus status) {
+        List<Event> allEvents = getAllEventsBetweenForUser(dateFrom, dateTo, user);
+        return allEvents.stream()
+                .filter(e -> switch (status) {
+                    case ARCHIVED -> e.getArchivedAt() != null;
+                    case COMPLETED -> e.getFinishedAt() != null;
+                    case NOT_COMPLETED -> e.getFinishedAt() == null && e.getArchivedAt() == null;
+                    case null -> true;
+                })
+                .toList();
     }
 
     public void save(Event event) {

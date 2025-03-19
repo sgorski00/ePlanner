@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.sgorski.EPlanner.model.ApplicationUser;
 import pl.sgorski.EPlanner.model.Event;
+import pl.sgorski.EPlanner.model.EventStatus;
 import pl.sgorski.EPlanner.service.EventService;
 import pl.sgorski.EPlanner.service.UserService;
 import pl.sgorski.EPlanner.utils.DateUtils;
@@ -39,6 +40,7 @@ public class EventsController {
     public String show(
             @RequestParam(value = "dateFrom", required = false) String dateFromStr,
             @RequestParam(value = "dateTo", required = false) String dateToStr,
+            @RequestParam(value = "status", required = false) String status,
             Model model,
             Principal principal,
             RedirectAttributes redirectAttributes
@@ -52,15 +54,21 @@ public class EventsController {
             dateTo = DateUtils.getLastDayOfMonth(LocalDate.now());
         }
 
-        ApplicationUser user;
-        try{
-            user = userService.findByUsername(principal.getName());
+        try {
+            EventStatus evStatus = EventStatus.valueOf(status.toUpperCase());
+            ApplicationUser user = userService.findByUsername(principal.getName());
+            List<Event> events = eventService.getAllEventsBetweenForUserWithStatus(dateFrom, dateTo, user, evStatus);
+            model.addAttribute("events", events);
+            model.addAttribute("status", status);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            ApplicationUser user = userService.findByUsername(principal.getName());
+            List<Event> events = eventService.getAllEventsBetweenForUser(dateFrom, dateTo, user);
+            model.addAttribute("events", events);
         } catch (NoSuchElementException e) {
             redirectAttributes.addFlashAttribute("info", "User not found");
             return "redirect:/";
         }
-        List<Event> events = eventService.getAllEventsBetweenForUser(dateFrom, dateTo, user);
-        model.addAttribute("events", events);
+
         model.addAttribute("dateFrom", dateFrom);
         model.addAttribute("dateTo", dateTo);
         return "events";
@@ -181,7 +189,9 @@ public class EventsController {
         try {
             ApplicationUser user = userService.findByUsername(principal.getName());
             Event event = eventService.getById(id);
-            event.setFinishedAt(Timestamp.from(Instant.now()));
+            if(!event.canEdit()){
+                throw new IllegalArgumentException("Cannot complete event with this status.");
+            }
             if(event.getUser().equals(user)) {
                 event.setFinishedAt(Timestamp.from(Instant.now()));
                 eventService.save(event);
@@ -189,7 +199,7 @@ public class EventsController {
             } else {
                 throw new AccessDeniedException("Access denied");
             }
-        } catch (NoSuchElementException | AccessDeniedException e) {
+        } catch (NoSuchElementException | AccessDeniedException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/events";
         }
@@ -206,7 +216,9 @@ public class EventsController {
         try {
             ApplicationUser user = userService.findByUsername(principal.getName());
             Event event = eventService.getById(id);
-            event.setFinishedAt(Timestamp.from(Instant.now()));
+            if(!event.canEdit()){
+                throw new IllegalArgumentException("Cannot archive event with this status.");
+            }
             if(event.getUser().equals(user)) {
                 event.setArchivedAt(Timestamp.from(Instant.now()));
                 eventService.save(event);
@@ -231,7 +243,6 @@ public class EventsController {
         try {
             ApplicationUser user = userService.findByUsername(principal.getName());
             Event event = eventService.getById(id);
-            event.setFinishedAt(Timestamp.from(Instant.now()));
             if(event.getUser().equals(user)) {
                 eventService.delete(event);
                 redirectAttributes.addFlashAttribute("info", "Event deleted successfully");
