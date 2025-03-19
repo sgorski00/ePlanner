@@ -9,11 +9,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import pl.sgorski.EPlanner.custom.validation.ValidPassword;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@ValidPassword
 @Entity
 @Table(name = "app_users")
 @Getter
@@ -34,6 +36,7 @@ public class ApplicationUser implements UserDetails {
     @Email
     private String email;
 
+    //Validated in class annotation
     private String password;
 
     @Enumerated(EnumType.STRING)
