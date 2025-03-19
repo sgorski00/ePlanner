@@ -11,7 +11,8 @@
         <h5 class="mb-4" th:if="${info}" th:text="${info}"></h5>
         <div class="col-md-12">
             <div class="mb-3 p-3 bg-light border rounded me-auto">
-            <table class="table table-bordered table-hover">
+                <h2 class="mb-4">Roles</h2>
+                <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
                     <th>Id</th>
@@ -20,7 +21,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="table-hover" role="button" th:each="role : ${roles}">
+                <tr class="table-hover" role="button" th:onclick="|window.location.href='@{/admin/users?role={role}(role=${role.name})}'|" th:each="role : ${roles}">
                     <td th:text="${role.id}"></td>
                     <td th:text="${role.name}"></td>
                     <td th:text="${role.users.size()}"></td>

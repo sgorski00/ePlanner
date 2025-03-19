@@ -24,4 +24,10 @@ public class RoleService {
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }
+
+    public Role getRoleByName(String name) {
+        return roleRepository.findByNameIgnoreCase(name).orElseThrow(
+                () -> new IllegalArgumentException("No role found with name: " + name)
+        );
+    }
 }

@@ -11,6 +11,17 @@
         <h5 class="mb-4" th:if="${info}" th:text="${info}"></h5>
         <div class="col-md-12">
             <div class="mb-3 p-3 bg-light border rounded me-auto">
+                <div class="d-flex justify-content-between mb-4">
+                    <h2>Users</h2>
+                    <form id="roleForm" th:action="@{/admin/users}" method="get">
+                        <label for="roleSel" class="form-label">Choose role:</label>
+                        <select id="roleSel" name="role" class="form-select" onchange="submitForm()">
+                            <option value="all">All</option>
+                            <option value="user" th:selected="${role != null && role.name.equalsIgnoreCase('user')}">Users</option>
+                            <option value="admin" th:selected="${role != null && role.name.equalsIgnoreCase('admin')}">Admins</option>
+                        </select>
+                    </form>
+                </div>
                 <table class="table table-bordered table-hover">
                     <thead>
                     <tr>
@@ -38,5 +49,10 @@
 
 <th:block th:replace="~{/fragments/body_fragments :: footer}"></th:block>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function submitForm() {
+        document.getElementById("roleForm").submit();
+    }
+</script>
 </body>
 </html>
