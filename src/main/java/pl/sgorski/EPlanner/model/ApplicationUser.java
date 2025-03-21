@@ -39,8 +39,9 @@ public class ApplicationUser implements UserDetails {
     //Validated in class annotation
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     private String provider = "LOCAL";
 
@@ -54,11 +55,6 @@ public class ApplicationUser implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.toString().toUpperCase()));
-    }
-
-    public enum Role {
-        USER,
-        ADMIN
     }
 
     @PreUpdate
