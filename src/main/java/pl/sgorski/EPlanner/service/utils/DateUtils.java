@@ -1,4 +1,4 @@
-package pl.sgorski.EPlanner.utils;
+package pl.sgorski.EPlanner.service.utils;
 
 import java.time.LocalDate;
 

@@ -1,5 +1,6 @@
 package pl.sgorski.EPlanner.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +23,7 @@ public class Role {
     @Column(unique = true)
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "role", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<ApplicationUser> users = new HashSet<>();
 

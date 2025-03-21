@@ -1,4 +1,4 @@
-package pl.sgorski.EPlanner;
+package pl.sgorski.EPlanner.config;
 
 import com.github.javafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;

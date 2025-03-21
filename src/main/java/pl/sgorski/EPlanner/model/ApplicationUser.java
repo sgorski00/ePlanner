@@ -9,7 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import pl.sgorski.EPlanner.custom.validation.ValidPassword;
+import pl.sgorski.EPlanner.model.validation.ValidPassword;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,10 +30,12 @@ public class ApplicationUser implements UserDetails {
 
     @NotBlank
     @Size(min = 3, max = 50)
+    @Column(unique = true, nullable = false)
     private String username;
 
     @NotBlank
     @Email
+    @Column(unique = true, nullable = false)
     private String email;
 
     //Validated in class annotation
@@ -43,6 +45,7 @@ public class ApplicationUser implements UserDetails {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    @Column(nullable = false)
     private String provider = "LOCAL";
 
     private String providerId;

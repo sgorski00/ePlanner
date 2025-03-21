@@ -51,4 +51,8 @@ public class EventService {
     public void delete(Event event) {
         repository.delete(event);
     }
+
+    public List<Event> getAll() {
+        return repository.findAll();
+    }
 }

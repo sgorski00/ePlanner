@@ -1,4 +1,4 @@
-package pl.sgorski.EPlanner.custom.validation;
+package pl.sgorski.EPlanner.model.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

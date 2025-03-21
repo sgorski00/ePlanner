@@ -2,6 +2,7 @@ package pl.sgorski.EPlanner.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,7 +13,7 @@ import pl.sgorski.EPlanner.model.Event;
 import pl.sgorski.EPlanner.model.EventStatus;
 import pl.sgorski.EPlanner.service.EventService;
 import pl.sgorski.EPlanner.service.UserService;
-import pl.sgorski.EPlanner.utils.DateUtils;
+import pl.sgorski.EPlanner.service.utils.DateUtils;
 
 import java.nio.file.AccessDeniedException;
 import java.security.Principal;
@@ -37,42 +38,47 @@ public class EventsController {
     }
 
     @GetMapping
-    public String show(
-            @RequestParam(value = "dateFrom", required = false) String dateFromStr,
-            @RequestParam(value = "dateTo", required = false) String dateToStr,
-            @RequestParam(value = "status", required = false) String status,
-            Model model,
-            Principal principal,
-            RedirectAttributes redirectAttributes
-    ) {
-        LocalDate dateFrom, dateTo;
-        try{
-            dateFrom = LocalDate.parse(dateFromStr);
-            dateTo = LocalDate.parse(dateToStr);
-        } catch (DateTimeParseException | NullPointerException e) {
-            dateFrom = LocalDate.now().withDayOfMonth(1);
-            dateTo = DateUtils.getLastDayOfMonth(LocalDate.now());
-        }
-
-        try {
-            EventStatus evStatus = EventStatus.valueOf(status.toUpperCase());
-            ApplicationUser user = userService.findByUsername(principal.getName());
-            List<Event> events = eventService.getAllEventsBetweenForUserWithStatus(dateFrom, dateTo, user, evStatus);
-            model.addAttribute("events", events);
-            model.addAttribute("status", status);
-        } catch (IllegalArgumentException | NullPointerException e) {
-            ApplicationUser user = userService.findByUsername(principal.getName());
-            List<Event> events = eventService.getAllEventsBetweenForUser(dateFrom, dateTo, user);
-            model.addAttribute("events", events);
-        } catch (NoSuchElementException e) {
-            redirectAttributes.addFlashAttribute("info", "User not found");
-            return "redirect:/";
-        }
-
-        model.addAttribute("dateFrom", dateFrom);
-        model.addAttribute("dateTo", dateTo);
-        return "events";
+    public ResponseEntity<List<Event>> showEvent() {
+        return ResponseEntity.status(200).body(eventService.getAll());
     }
+
+//    @GetMapping
+//    public String show(
+//            @RequestParam(value = "dateFrom", required = false) String dateFromStr,
+//            @RequestParam(value = "dateTo", required = false) String dateToStr,
+//            @RequestParam(value = "status", required = false) String status,
+//            Model model,
+//            Principal principal,
+//            RedirectAttributes redirectAttributes
+//    ) {
+//        LocalDate dateFrom, dateTo;
+//        try{
+//            dateFrom = LocalDate.parse(dateFromStr);
+//            dateTo = LocalDate.parse(dateToStr);
+//        } catch (DateTimeParseException | NullPointerException e) {
+//            dateFrom = LocalDate.now().withDayOfMonth(1);
+//            dateTo = DateUtils.getLastDayOfMonth(LocalDate.now());
+//        }
+//
+//        try {
+//            EventStatus evStatus = EventStatus.valueOf(status.toUpperCase());
+//            ApplicationUser user = userService.findByUsername(principal.getName());
+//            List<Event> events = eventService.getAllEventsBetweenForUserWithStatus(dateFrom, dateTo, user, evStatus);
+//            model.addAttribute("events", events);
+//            model.addAttribute("status", status);
+//        } catch (IllegalArgumentException | NullPointerException e) {
+//            ApplicationUser user = userService.findByUsername(principal.getName());
+//            List<Event> events = eventService.getAllEventsBetweenForUser(dateFrom, dateTo, user);
+//            model.addAttribute("events", events);
+//        } catch (NoSuchElementException e) {
+//            redirectAttributes.addFlashAttribute("info", "User not found");
+//            return "redirect:/";
+//        }
+//
+//        model.addAttribute("dateFrom", dateFrom);
+//        model.addAttribute("dateTo", dateTo);
+//        return "events";
+//    }
 
     @GetMapping("/{id}")
     public String showEvent(
