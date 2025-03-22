@@ -17,8 +17,12 @@
                         <label for="roleSel" class="form-label">Choose role:</label>
                         <select id="roleSel" name="role" class="form-select" onchange="submitForm()">
                             <option value="all">All</option>
-                            <option value="user" th:selected="${role != null && role.name.equalsIgnoreCase('user')}">Users</option>
-                            <option value="admin" th:selected="${role != null && role.name.equalsIgnoreCase('admin')}">Admins</option>
+                            <option value="user" th:selected="${role != null && role.name.equalsIgnoreCase('user')}">
+                                Users
+                            </option>
+                            <option value="admin" th:selected="${role != null && role.name.equalsIgnoreCase('admin')}">
+                                Admins
+                            </option>
                         </select>
                     </form>
                 </div>
@@ -33,13 +37,39 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr class="table-hover" role="button" th:each="user : ${users}">
-                        <td th:text="${user.id}"></td>
-                        <td th:text="${user.username}"></td>
-                        <td th:text="${user.email}"></td>
-                        <td th:text="${user.provider}"></td>
-                        <td th:text="${user.role}"></td>
-                    </tr>
+                    <th:block th:each="user : ${users}">
+                        <tr class="table-hover" role="button" th:onclick="'expand(' + ${user.id} +')'">
+                            <td th:text="${user.id}"></td>
+                            <td th:text="${user.username}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td th:text="${user.provider}"></td>
+                            <td th:text="${user.role}"></td>
+                        </tr>
+                        <tr th:id="${'expanded' + user.id}" hidden>
+                            <td colspan="4">
+                                <form th:action="@{'/admin/users/update/' + ${user.id}}" method="post" class="d-flex justify-content-evenly align-items-center gap-3">
+                                    <label for="email" class="form-label">Email:</label>
+                                    <input type="email" name="email" id="email" th:value="${user.email}" class="form-control" required>
+                                    <label for="role" class="form-label">Role:</label>
+                                    <select id="role" name="role" class="form-select">
+                                        <option value="USER" th:selected="${user.role.name.equalsIgnoreCase('user')}">User</option>
+                                        <option value="ADMIN" th:selected="${user.role.name.equalsIgnoreCase('admin')}">Admin</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">
+                                        Save
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form th:action="@{'/admin/users/delete/' + ${user.id}}" method="post" class="d-flex justify-content-center">
+                                    <button type="submit" class="btn btn-danger"
+                                            onclick="return confirm('You are going to delete user. Are you sure?')">
+                                        Delete user
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </th:block>
                     </tbody>
                 </table>
             </div>
@@ -52,6 +82,15 @@
 <script>
     function submitForm() {
         document.getElementById("roleForm").submit();
+    }
+
+    function expand(id) {
+        let expandRow = document.getElementById("expanded" + id);
+        if (expandRow.hidden) {
+            expandRow.hidden = false;
+        } else {
+            expandRow.hidden = true;
+        }
     }
 </script>
 </body>

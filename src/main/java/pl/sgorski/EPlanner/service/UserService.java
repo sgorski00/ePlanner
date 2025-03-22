@@ -39,4 +39,15 @@ public class UserService {
     public List<ApplicationUser> getUsersWithRole(Role role) {
         return userRepository.findAllByRole(role);
     }
+
+    public void deleteById(long id) {
+        userRepository.deleteById(id);
+    }
+
+    public void changeUserDataById(long id, Role role, String email) {
+        ApplicationUser user = userRepository.findById(id).orElseThrow();
+        user.setRole(role);
+        user.setEmail(email);
+        userRepository.save(user);
+    }
 }
