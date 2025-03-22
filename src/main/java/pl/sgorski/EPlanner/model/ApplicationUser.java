@@ -74,4 +74,19 @@ public class ApplicationUser implements UserDetails {
     public static void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         ApplicationUser.passwordEncoder = passwordEncoder;
     }
+
+    public long getEventCount(EventStatus status) {
+        return switch (status){
+            case NOT_COMPLETED -> events.stream()
+                        .filter(e -> e.getArchivedAt() == null && e.getFinishedAt() == null)
+                        .count();
+            case COMPLETED -> events.stream()
+                        .filter(e -> e.getFinishedAt() != null)
+                        .count();
+            case ARCHIVED -> events.stream()
+                        .filter(e -> e.getArchivedAt() != null)
+                        .count();
+            case null -> events.size();
+        };
+    }
 }

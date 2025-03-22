@@ -6,19 +6,29 @@
 <th:block th:replace="~{/fragments/body_fragments :: nav}"></th:block>
 
 <main class="content container mt-4 w-lg-75 mx-auto">
+    <h6 th:if="${info}" th:text="${info}"></h6>
+    <h6 th:if="${error}" th:text="${error}" class="text-danger"></h6>
     <div class="row">
         <div class="col-md-8 pb-sm-3">
-            <div class="card shadow-sm">
-                <h6 th:if="${info}" th:text="${info}"></h6>
-                <h6 th:if="${error}" th:text="${error}" class="text-danger"></h6>
+            <div class="card shadow-sm" id="profileCard">
                 <div class="card-header bg-dark text-white">
-                    <h3 class="mb-0" th:text="${user.username}"></h3>
+                    <h3 class="mb-0" th:text="${user.username} + ' - profile'"></h3>
                 </div>
                 <div class="card-body">
                     <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
                     <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
                     <p><strong>Role:</strong> <span th:text="${user.role}"></span></p>
-                    <p><strong>Number of events:</strong> <span th:text="${eventsSize}"></span></p>
+                </div>
+            </div>
+            <div class="card shadow-sm" id="statsCard" hidden>
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0" th:text="${user.username} + ' - stats'"></h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Total events:</strong> <span th:text="${totalEvents}"></span></p>
+                    <p><strong>Ongoing events:</strong> <span th:text="${ongoingEvents}"></span></p>
+                    <p><strong>Finished events:</strong> <span th:text="${completedEvents}"></span></p>
+                    <p><strong>Archived events:</strong> <span th:text="${archivedEvents}"></span></p>
                 </div>
             </div>
         </div>
@@ -44,6 +54,7 @@
                     </form>
                     </div>
                     <a th:href="@{/events}" class="btn btn-primary w-100 mb-2">Show events</a>
+                    <a id="displayButton" href="#" class="btn btn-primary w-100 mb-2" onclick="changeDisplay()">Show stats</a>
                     <form th:action="@{/profile/delete}" method="post"
                           onsubmit="return confirm('Are you sure that you want to delete the account?');">
                         <button type="submit" class="btn btn-danger w-100">Delete account</button>
@@ -73,6 +84,22 @@
         if(passInput1.value !== passInput2.value) {
             window.alert("Passwords are not the same!")
             return false;
+        }
+    }
+
+    function changeDisplay() {
+        let profileCard = document.getElementById("profileCard");
+        let statsCard = document.getElementById("statsCard");
+        let displayButton = document.getElementById("displayButton");
+
+        if(statsCard.hidden) {
+            profileCard.hidden = true;
+            statsCard.hidden = false;
+            displayButton.value = "Show profile"
+        } else {
+            profileCard.hidden = false;
+            statsCard.hidden = true;
+            displayButton.value = "Show stats"
         }
     }
 </script>
