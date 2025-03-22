@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import pl.sgorski.EPlanner.model.ApplicationUser;
+import pl.sgorski.EPlanner.model.Role;
 import pl.sgorski.EPlanner.repository.UserRepository;
 
 import java.util.List;
@@ -18,10 +19,12 @@ import java.util.Optional;
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final RoleService roleService;
 
     @Autowired
-    public OAuth2UserService(UserRepository userRepository) {
+    public OAuth2UserService(UserRepository userRepository, RoleService roleService) {
         this.userRepository = userRepository;
+        this.roleService = roleService;
     }
 
     @Override
@@ -34,7 +37,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         ApplicationUser user = getUserAndSaveIfNotExist(email, provider, providerId);
 
         return new DefaultOAuth2User(
-                List.of(new SimpleGrantedAuthority(user.getRole().toString())),
+                user.getAuthorities(),
                 oAuth2User.getAttributes(),
                 "email"
         );
@@ -48,6 +51,9 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             user.setUsername(email);
             user.setProvider(provider);
             user.setProviderId(providerId);
+
+            Role userRole = roleService.getRoleByName("user");
+            user.setRole(userRole);
             return userRepository.save(user);
         }
         return oUser.get();

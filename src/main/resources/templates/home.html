@@ -6,11 +6,59 @@
 <th:block th:replace="~{/fragments/body_fragments :: nav}"></th:block>
 
 <main class="content container mt-4 w-lg-75 mx-auto">
-    <h2>Page content</h2>
-    <p>xyz</p>
+    <h2>Home page - ePlanner</h2>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-header">Upcoming event:</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${upcomingEvent?.name ?: 'There is no upcoming event!'}"></h5>
+                    <p class="card-text" th:text="${upcomingEvent?.day ?: '---'}"></p>
+                    <p class="card-text" th:text="${upcomingEvent?.hour ?: '---'}"></p>
+                    <p class="card-text" th:text="${upcomingEvent?.description ?: '---'}"></p>
+                    <a th:href="@{/events/add}" class="btn btn-primary mt-2 w-100">Add new event</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-header">Today is:</div>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <span id="date"></span>
+                    </h5>
+                    <p class="card-text">
+                        <span id="clock"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-header">Events counter</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${totalEvents}">0</h5>
+                    <a th:href="@{/events}" class="btn btn-primary mt-2 w-100">Go to your events</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 
 <th:block th:replace="~{/fragments/body_fragments :: footer}"></th:block>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function updateClock() {
+        const now = new Date();
+        document.getElementById("clock").textContent = now.toLocaleTimeString();
+        document.getElementById("date").textContent = now.toLocaleDateString();
+    }
+
+    setInterval(updateClock, 1000);
+
+    updateClock();
+</script>
 </body>
 </html>

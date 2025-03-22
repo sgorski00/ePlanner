@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import pl.sgorski.EPlanner.model.ApplicationUser;
 import pl.sgorski.EPlanner.service.OAuth2UserService;
@@ -34,8 +35,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/style.css", "/images/**", "/h2-console/**").permitAll()
+                        .requestMatchers("/style.css", "/images/**").permitAll()
                         .requestMatchers("/login/**", "/register/**").not().authenticated()
+                        .requestMatchers("/admin/**", "/h2-console/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(login -> login
                         .loginPage("/login")
