@@ -37,7 +37,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         ApplicationUser user = getUserAndSaveIfNotExist(email, provider, providerId);
 
         return new DefaultOAuth2User(
-                List.of(new SimpleGrantedAuthority(user.getRole().toString())),
+                user.getAuthorities(),
                 oAuth2User.getAttributes(),
                 "email"
         );
